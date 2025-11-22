@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mesmeralis.revelationPVP.Commands.RolesCommand;
+import org.mesmeralis.revelationPVP.Listeners.InventoryListener;
 import org.mesmeralis.revelationPVP.Listeners.PlayerDamageListener;
 import org.mesmeralis.revelationPVP.Listeners.PlayerKillListener;
 import org.mesmeralis.revelationPVP.Managers.KillManager;
@@ -42,6 +43,7 @@ public final class RevelationPVP extends JavaPlugin {
         this.rankManager = new RankManager(this);
         this.roleManager = new RoleManager(this.data);
         this.initListeners();
+        this.registerCommands();
         rankManager.loadRanks();
         new PapiExpansion(this).register();
         Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, () -> {
@@ -94,6 +96,7 @@ public final class RevelationPVP extends JavaPlugin {
     private void initListeners() {
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerDamageListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerKillListener(this, manager), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
     }
 
     private void registerCommands() {

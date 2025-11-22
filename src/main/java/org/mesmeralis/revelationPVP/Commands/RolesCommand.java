@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.mesmeralis.revelationPVP.Gui.RolesGui;
 import org.mesmeralis.revelationPVP.RevelationPVP;
 import org.mesmeralis.revelationPVP.Roles;
@@ -20,12 +21,10 @@ public class RolesCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
             return true;
         }
-
-        final Player player = (Player) sender;
 
         if (args.length == 0) {
             player.openInventory(RolesGui.forPlayer(player));
@@ -38,12 +37,12 @@ public class RolesCommand implements CommandExecutor {
             final Roles currentRole = this.main.getRoleManager().getRole(player.getUniqueId());
 
             if (currentRole == Roles.CITIZEN) {
-                player.sendMessage(ColourUtils.colour(main.PREFIX + "&cYou are not currently on a team."));
+                player.sendMessage(ColourUtils.colour(RevelationPVP.PREFIX + "&cYou are not currently on a team."));
                 return true;
             }
 
             this.main.getRoleManager().setRole(player.getUniqueId(), Roles.CITIZEN, ignored ->
-                    player.sendMessage(ColourUtils.colour(main.PREFIX + "&cYou have left your team."))
+                    player.sendMessage(ColourUtils.colour(RevelationPVP.PREFIX + "&cYou have left your team."))
             );
             return true;
         }
@@ -57,14 +56,14 @@ public class RolesCommand implements CommandExecutor {
             } else {
                 elapsed = this.main.reload("-config");
             }
-            sender.sendMessage(ColourUtils.colour(main.PREFIX + "&aPlugin reloaded in " + elapsed + "ms."));
+            sender.sendMessage(ColourUtils.colour(RevelationPVP.PREFIX + "&aPlugin reloaded in " + elapsed + "ms."));
         }
 
         if(argument.equalsIgnoreCase("info")) {
             if(main.getRoleManager().getRole(player.getUniqueId()) == null) {
-                sender.sendMessage(ColourUtils.colour(main.PREFIX + "&cYou are not on a team."));
+                sender.sendMessage(ColourUtils.colour(RevelationPVP.PREFIX + "&cYou are not on a team."));
             } else {
-                sender.sendMessage(ColourUtils.colour(main.PREFIX + "&aYour team is: " + main.getRoleManager().getRole(player.getUniqueId()).getPrefix()));
+                sender.sendMessage(ColourUtils.colour(RevelationPVP.PREFIX + "&aYour team is: " + main.getRoleManager().getRole(player.getUniqueId()).getPrefix()));
             }
         }
 

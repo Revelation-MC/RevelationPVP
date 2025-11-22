@@ -55,7 +55,7 @@ public class RoleManager {
     }
 
     public void setRole(UUID uuid, Roles role, Consumer<Roles> consumer) {
-        this.updateTeam(uuid, role)
+        this.updateRole(uuid, role)
                 .thenAcceptAsync(v -> this.roles.put(uuid, role))
                 .thenAccept(v -> this.firstRoleChange.remove(uuid))
                 .thenAccept(v -> consumer.accept(role));
@@ -84,7 +84,7 @@ public class RoleManager {
         return uuids;
     }
 
-    private CompletableFuture<Void> updateTeam(UUID uuid, Roles role) {
+    private CompletableFuture<Void> updateRole(UUID uuid, Roles role) {
         return CompletableFuture.runAsync(() -> this.storage.setRole(uuid, role));
     }
 }

@@ -18,7 +18,7 @@ public class PapiExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "revelationPVP";
+        return "ascensionpvp";
     }
 
     @Override
@@ -65,6 +65,25 @@ public class PapiExpansion extends PlaceholderExpansion {
         }
         if (params.equalsIgnoreCase("topwins")) {
             return ColourUtils.colour(Bukkit.getOfflinePlayer(main.topWins).getName());
+        }
+
+        if(params.equalsIgnoreCase("role")) {
+            PapiExpansion.Record record = this.main.map.get(player.getUniqueId());
+
+            // 1. Record does not exist yet
+            if (record == null) {
+                return ColourUtils.colour("&7None");
+            }
+
+            Roles role = record.role;
+
+            // 2. Role is null
+            if (role == null) {
+                return ColourUtils.colour("&7None");
+            }
+
+            // 3. Return properly formatted prefix
+            return ColourUtils.colour(role.getPrefix());
         }
         /***
          * if (params.equalsIgnoreCase("mode")) {

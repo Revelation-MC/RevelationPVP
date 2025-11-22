@@ -42,28 +42,28 @@ public class RolesGui {
         final Inventory inventory = Bukkit.createInventory(null, rows * 9, TITLE);
 
         int slot = 10;
-        for (Roles team : Roles.values()) {
-            if (team == Roles.CITIZEN) {
+        for (Roles role : Roles.values()) {
+            if (role == Roles.CITIZEN) {
                 continue;
             }
 
-            final ItemStack icon = new ItemStack(team.getIcon(), 1);
+            final ItemStack icon = new ItemStack(role.getIcon(), 1);
             final ItemMeta meta = icon.getItemMeta();
 
             if (meta == null) {
                 continue;
             }
 
-            final List<String> description = Arrays.stream(team.getDescription()).map(ColourUtils::colour).collect(Collectors.toList());
+            final List<String> description = Arrays.stream(role.getDescription()).map(ColourUtils::colour).collect(Collectors.toList());
 
             description.add(0, ""); // Blank line.
             description.add(""); // Yet another blank line.
 
-            if (team == currentRole) {
-                meta.setDisplayName(team.getPrefix());
+            if (role == currentRole) {
+                meta.setDisplayName(role.getPrefix());
                 description.add(ChatColor.RED + "You already have this role.");
             } else {
-                meta.setDisplayName(team.getPrefix());
+                meta.setDisplayName(role.getPrefix());
                 description.add(ChatColor.RED + "Fee: " + ChatColor.DARK_GREEN + "$" + ChatColor.GREEN + plugin.getConfig().getDouble("role-change-fee"));
             }
 
