@@ -1,5 +1,9 @@
-name: RevelationPVP
+name: AscensionPVP
 version: '1.0-SNAPSHOT'
 main: org.mesmeralis.revelationPVP.RevelationPVP
 api-version: '1.21'
-
+commands:
+  roles:
+    aliases: [class, classes]
+    usage: /<command> [role]
+    description: Choose your role.

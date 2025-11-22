@@ -68,7 +68,12 @@ public class PlayerKillListener implements Listener {
                 break;
         }
 
+    }
 
+    private void deathMessage(Player killer, Player killed) {
+        if(killer==null) {
+            
+        }
     }
 
 }

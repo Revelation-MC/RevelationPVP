@@ -2,10 +2,12 @@ package org.mesmeralis.revelationPVP.Storage;
 
 import org.bukkit.entity.Player;
 import org.mesmeralis.revelationPVP.RevelationPVP;
+import org.mesmeralis.revelationPVP.Roles;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -22,8 +24,13 @@ public class SQLGetter {
         PreparedStatement ps;
         try {
             ps = main.storage.getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS pvp "
-                    + "(NAME VARCHAR(100), UUID VARCHAR(100), KILLS INT(100), DEATHS INT(100), WINS INT(100), POINTS INT(100), PRIMARY KEY(NAME))");
+                    + "(NAME VARCHAR(100), UUID VARCHAR(100), KILLS INT(100), DEATHS INT(100), WINS INT(100), POINTS INT(100), ROLE VARCHAR(100), PRIMARY KEY(NAME))");
             ps.executeUpdate();
+            ps.close();
+            try (Statement st = main.storage.getConnection().createStatement()) {
+                st.executeUpdate("ALTER TABLE pvp MODIFY COLUMN ROLE VARCHAR(32)");
+            } catch (SQLException ignored) {
+                            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -38,6 +45,7 @@ public class SQLGetter {
                     ps2.setString(1, player.getName());
                     ps2.setString(2, uuid.toString());
                     ps2.executeUpdate();
+                    ps2.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -70,6 +78,25 @@ public class SQLGetter {
                 ps.setInt(1, getPoints(uuid).join() + points);
                 ps.setString(2, uuid.toString());
                 ps.executeUpdate();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public CompletableFuture<Void> setRole(UUID uuid, Roles role) {
+        this.main.map.compute(uuid, (uid, rolee) -> {
+            rolee.setRole(role);
+            return rolee;
+        });
+        return CompletableFuture.runAsync(() -> {
+            try {
+                PreparedStatement ps = main.storage.getConnection().prepareStatement("UPDATE pvp SET ROLE=? WHERE UUID =?");
+                ps.setString(1, role.name());
+                ps.setString(2, uuid.toString());
+                ps.executeUpdate();
+                ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -87,6 +114,7 @@ public class SQLGetter {
                         ps.setInt(1, getWins(uuid).join() + wins);
                         ps.setString(2, uuid.toString());
                         ps.executeUpdate();
+                        ps.close();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -105,6 +133,7 @@ public class SQLGetter {
                 ps.setInt(1, getDeaths(uuid).join() + deaths);
                 ps.setString(2, uuid.toString());
                 ps.executeUpdate();
+                ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -122,6 +151,7 @@ public class SQLGetter {
                 ps.setInt(1, getKills(uuid).join() + kills);
                 ps.setString(2, uuid.toString());
                 ps.executeUpdate();
+                ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -176,6 +206,26 @@ public class SQLGetter {
         });
     }
 
+    public CompletableFuture<Roles> getRole(UUID uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                PreparedStatement ps = main.storage.getConnection().prepareStatement("SELECT ROLE FROM pvp WHERE UUID=?");
+                ps.setString(1, uuid.toString());
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    String roleName = rs.getString("ROLE");
+                    if (roleName == null || roleName.isEmpty()) {
+                        return Roles.CITIZEN; // default
+                    }
+                    return Roles.valueOf(roleName);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return Roles.CITIZEN;
+        });
+    }
+
     public CompletableFuture<Integer> getWins(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -221,5 +271,6 @@ public class SQLGetter {
             return null;
         });
     }
+
 
 }

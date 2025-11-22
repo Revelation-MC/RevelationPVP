@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.mesmeralis.revelationPVP.Roles;
 import org.mesmeralis.revelationPVP.Utils.ColourUtils;
 import org.mesmeralis.revelationPVP.RevelationPVP;
 
@@ -92,12 +93,14 @@ public class PapiExpansion extends PlaceholderExpansion {
         public int kills;
         public int deaths;
         public int wins;
+        public Roles role;
 
-        public Record(int points, int kills, int deaths, int wins) {
+        public Record(int points, int kills, int deaths, int wins, Roles role) {
             this.points = points;
             this.kills = kills;
             this.deaths = deaths;
             this.wins = wins;
+            this.role = role;
         }
 
         public void addPoints(int points) {
@@ -112,7 +115,7 @@ public class PapiExpansion extends PlaceholderExpansion {
         public void addWins(int wins) {
             this.wins += wins;
         }
-
+        public void setRole(Roles role) { this.role = role; }
     }
 
 }

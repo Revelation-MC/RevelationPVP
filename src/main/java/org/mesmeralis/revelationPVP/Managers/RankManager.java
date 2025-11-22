@@ -28,12 +28,12 @@ public class RankManager {
         } else {
             Bukkit.getLogger().info("Ranks have been set in the config.");
         }
-        for (String rank : config.getConfigurationSection("ranks").getKeys(false)) {
+        /*** for (String rank : config.getConfigurationSection("ranks").getKeys(false)) {
             int points = config.getInt("ranks." + rank + ".points");
             String prefix = config.getString("ranks." + rank + ".prefix");
             rankThresholds.put(points, rank);
             rankPrefixes.put(rank, prefix);
-        }
+        } ***/
     }
 
     public String getRankFromPoints(int points) {

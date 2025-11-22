@@ -36,10 +36,8 @@ public enum Roles {
             return baseDamage;
         }
     },
-    ASSASSIN(Material.DIAMOND_SWORD, ColourUtils.colour("#2A2A2A&lASSASSIN"),
+    ASSASSIN(Material.BOW, ColourUtils.colour("#2A2A2A&lASSASSIN"),
             ColourUtils.colour("#2A2A2A&lA"),
-            "&aNot affected by soulsand.",
-            "&aAll chestplates have Thorns when equipped.",
             "&aIssues 5s of poison when fighting players. &7(30s cooldown)") {
         private final List<EntityType> protectedEntities = Arrays.asList(
                 EntityType.ZOMBIE, EntityType.PHANTOM, EntityType.SPIDER,
@@ -73,11 +71,9 @@ public enum Roles {
             return baseDamage;
         }
     },
-    HYPNOTIST(Material.ENDER_PEARL, ColourUtils.colour("#38C7B6&lHYPNOTIST"),
+    HYPNOTIST(Material.RECOVERY_COMPASS, ColourUtils.colour("#38C7B6&lHYPNOTIST"),
             ColourUtils.colour("#38C7B6&lH"),
-            "&aIssues 5s of blindness when fighting players. &7(30s cooldown)",
-            "&aImmune to magic by Witches.",
-            "&aIssues fire aspect against entities and blocks when punching with fist. &7(30s cooldown)") {
+            "&aIssues 10s of nausea when fighting players. &7(1m cooldown)") {
         private final Map<UUID, Long> abilityCoolDowns = new HashMap<>();
 
         @Override
@@ -87,7 +83,7 @@ public enum Roles {
 
         @Override
         public double applyCombatPerks(Player attacker, Player victim, double baseDamage) {
-            if (!attacker.hasPotionEffect(PotionEffectType.SPEED) && (System.currentTimeMillis() - this.abilityCoolDowns.getOrDefault(attacker.getUniqueId(), 0L)) > 30000L) {
+            if (!attacker.hasPotionEffect(PotionEffectType.SPEED) && (System.currentTimeMillis() - this.abilityCoolDowns.getOrDefault(attacker.getUniqueId(), 0L)) > 60000L) {
                 attacker.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 60, 2, false, false));
                 this.abilityCoolDowns.put(attacker.getUniqueId(), System.currentTimeMillis());
             }
@@ -104,11 +100,9 @@ public enum Roles {
             return baseDamage;
         }
     },
-    VIKING(Material.BAMBOO, ColourUtils.colour("#B4602B&lVIKING"),
+    VIKING(Material.SHIELD, ColourUtils.colour("#B4602B&lVIKING"),
             ColourUtils.colour("#B4602B&lV"),
-            "&a+0.3x walk speed increase.",
-            "&aFreezes entities for 3 seconds when shooting with an arrow. &7(60s cooldown)",
-            "&aGoes invisible for 3 sec when damaged by players. &7(60s cooldown)") {
+            "&aGets strength for 10 seconds. &7(60s cooldown)") {
         @Override
         public void applyJoinPerks(Player player) {
         }
