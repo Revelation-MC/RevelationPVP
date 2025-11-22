@@ -1,0 +1,5 @@
+name: RevelationPVP
+version: '1.0-SNAPSHOT'
+main: org.mesmeralis.revelationPVP.RevelationPVP
+api-version: '1.21'
+
