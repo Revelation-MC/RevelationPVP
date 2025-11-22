@@ -1,5 +1,6 @@
 package org.mesmeralis.revelationPVP.Listeners;
 
+import org.bukkit.Bukkit;
 import org.mesmeralis.revelationPVP.Utils.ColourUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -41,23 +42,24 @@ public class InventoryListener implements Listener {
                 return;
             }
         }
+        Bukkit.getServer().broadcastMessage("DEBUG: Slot = " + e.getSlot());
 
         if (role == null) return;
 
-        final double roleChangeFee = this.main.getConfig().getDouble("role-change-fee");
+      //  final double roleChangeFee = this.main.getConfig().getDouble("role-change-fee");
         final Roles currentRole = this.main.getRoleManager().getRole(player.getUniqueId());
 
         // Fix #2 — correct method name
-        if (!this.main.getRoleManager().isFirstRoleChange(player.getUniqueId())) {
+      //  if (!this.main.getRoleManager().isFirstRoleChange(player.getUniqueId())) {
 
             Roles finalRole = role;
-            this.main.getEconomy().ifPresent(economy -> {
-                if (economy.getBalance(player) >= roleChangeFee) {
+            //this.main.getEconomy().ifPresent(economy -> {
+              //  if (economy.getBalance(player) >= roleChangeFee) {
 
                     if (currentRole != finalRole) {
 
-                        economy.withdrawPlayer(player, roleChangeFee);
-                        player.sendMessage(RevelationPVP.PREFIX + ChatColor.RED + "-" + ChatColor.DARK_GREEN + "$" + ChatColor.GREEN + roleChangeFee);
+                    //    economy.withdrawPlayer(player, roleChangeFee);
+                       // player.sendMessage(RevelationPVP.PREFIX + ChatColor.RED + "-" + ChatColor.DARK_GREEN + "$" + ChatColor.GREEN + roleChangeFee);
 
                         // Fix #3 — close GUI *inside* callback
                         this.main.getRoleManager().setRole(player.getUniqueId(), finalRole, newRole -> {
@@ -69,18 +71,17 @@ public class InventoryListener implements Listener {
                         player.sendMessage(RevelationPVP.PREFIX + ColourUtils.colour("&cYou are already on this team."));
                     }
 
-                } else {
-                    player.sendMessage(RevelationPVP.PREFIX + ColourUtils.colour("&cYou do not have enough money to change your team."));
-                }
-            });
+               // }
+          //  });
 
-        } else {
+
+      /**  } else {
             // First change is FREE
             this.main.getRoleManager().setRole(player.getUniqueId(), role, newRole -> {
                 player.sendMessage(ColourUtils.colour(RevelationPVP.PREFIX + "&aYour team is now " + newRole.getPrefix()));
                 player.closeInventory();
             });
-        }
+        }**/
     }
 
 }

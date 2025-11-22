@@ -13,7 +13,7 @@ import org.mesmeralis.revelationPVP.Utils.ColourUtils;
 import java.util.*;
 
 public enum Roles {
-    CITIZEN(Material.AIR, ColourUtils.colour("&fCitizen"), ColourUtils.colour("&fC"), "This person has no powers.") {
+    CITIZEN(Material.AIR, ColourUtils.colour("&7Human"), ColourUtils.colour("&7H"), "This person has no powers.") {
         @Override
         public void applyJoinPerks(Player player) {
             // Nothing to do. Citizens suck.
@@ -36,8 +36,8 @@ public enum Roles {
             return baseDamage;
         }
     },
-    ASSASSIN(Material.BOW, ColourUtils.colour("#2A2A2A&lASSASSIN"),
-            ColourUtils.colour("#2A2A2A&lA"),
+    ASSASSIN(Material.BOW, ColourUtils.colour("#2b67b5&lASSASSIN"),
+            ColourUtils.colour("#2b67b5&lA"),
             "&aIssues 5s of poison when fighting players. &7(30s cooldown)") {
         private final List<EntityType> protectedEntities = Arrays.asList(
                 EntityType.ZOMBIE, EntityType.PHANTOM, EntityType.SPIDER,

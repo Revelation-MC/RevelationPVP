@@ -1,6 +1,7 @@
 package org.mesmeralis.revelationPVP.Storage;
 
 import org.bukkit.entity.Player;
+import org.mesmeralis.revelationPVP.Papi.PapiExpansion;
 import org.mesmeralis.revelationPVP.RevelationPVP;
 import org.mesmeralis.revelationPVP.Roles;
 
@@ -68,7 +69,7 @@ public class SQLGetter {
     }
 
     public CompletableFuture<Void> addPoints(UUID uuid, int points) {
-        this.main.map.compute(uuid, (uid, pointss) -> {
+        this.main.map.computeIfPresent(uuid, (uid, pointss) -> {
             pointss.addPoints(points);
             return pointss;
         });
@@ -86,15 +87,22 @@ public class SQLGetter {
     }
 
     public CompletableFuture<Void> setRole(UUID uuid, Roles role) {
-        this.main.map.compute(uuid, (uid, rolee) -> {
-            rolee.setRole(role);
-            return rolee;
+        // Update or create the Record in memory
+        System.out.println("[DEBUG] Saving role " + role.name() + " for " + uuid);
+        this.main.map.compute(uuid, (uid, rec) -> {
+            if (rec == null) {
+                return new PapiExpansion.Record(0, 0, 0, 0, role);
+            } else {
+                rec.setRole(role);
+                return rec;
+            }
         });
         return CompletableFuture.runAsync(() -> {
             try {
                 PreparedStatement ps = main.storage.getConnection().prepareStatement("UPDATE pvp SET ROLE=? WHERE UUID =?");
                 ps.setString(1, role.name());
                 ps.setString(2, uuid.toString());
+                System.out.println("[DEBUG] SQL: UPDATE pvp SET ROLE=" + role.name() + " WHERE UUID=" + uuid);
                 ps.executeUpdate();
                 ps.close();
             } catch (SQLException e) {
@@ -104,7 +112,7 @@ public class SQLGetter {
     }
 
     public CompletableFuture<Void> addWins(UUID uuid, int wins) {
-        this.main.map.compute(uuid, (uid, winss) -> {
+        this.main.map.computeIfPresent(uuid, (uid, winss) -> {
             winss.addWins(wins);
             return winss;
         });
@@ -211,12 +219,14 @@ public class SQLGetter {
             try {
                 PreparedStatement ps = main.storage.getConnection().prepareStatement("SELECT ROLE FROM pvp WHERE UUID=?");
                 ps.setString(1, uuid.toString());
+                System.out.println("[ROLE-DEBUG] SQLGetter.getRole() called for " + uuid);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
                     String roleName = rs.getString("ROLE");
                     if (roleName == null || roleName.isEmpty()) {
                         return Roles.CITIZEN; // default
                     }
+                    System.out.println("[ROLE-DEBUG] SQL returned: " + roleName);
                     return Roles.valueOf(roleName);
                 }
             } catch (SQLException e) {

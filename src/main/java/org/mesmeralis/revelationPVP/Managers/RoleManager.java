@@ -23,68 +23,61 @@ public class RoleManager {
 
     public void shutdown() {
         this.roles.clear();
+        this.firstRoleChange.clear();
     }
 
     public void loadAll() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            this.loadUser(player.getUniqueId());
+            this.loadUserAsync(player.getUniqueId());
         }
     }
 
-    public Roles load(UUID uuid) {
-        if (Bukkit.isPrimaryThread()) {
-            throw new IllegalStateException("Do not execute this method on the main server thread!");
-        }
-        return this.loadUser(uuid);
+    public void loadUserAsync(UUID uuid) {
+        storage.getRole(uuid).thenAccept(role -> {
+            System.out.println("[ROLE-DEBUG] RoleManager loaded " + uuid + " = " + role);
+            if (role == null) {
+                firstRoleChange.add(uuid);
+                roles.put(uuid, Roles.CITIZEN);
+            } else {
+                roles.put(uuid, role);
+            }
+        });
     }
 
-    /*
-     * This method stays private, Tyler... If you want to load a user's data, call the above method from a separate thread.
-     */
+    @Deprecated
     private Roles loadUser(UUID uuid) {
-            return this.roles.computeIfAbsent(uuid, id -> {
-                Roles dbRole = this.storage.getRole(id).join();
-
-                if (dbRole == null) {
-                    this.firstRoleChange.add(id);
-                    return Roles.CITIZEN;
-                }
-
-                return dbRole;
-            });
+        throw new UnsupportedOperationException("Use loadUserAsync instead");
     }
 
-    public void setRole(UUID uuid, Roles role, Consumer<Roles> consumer) {
-        this.updateRole(uuid, role)
-                .thenAcceptAsync(v -> this.roles.put(uuid, role))
-                .thenAccept(v -> this.firstRoleChange.remove(uuid))
-                .thenAccept(v -> consumer.accept(role));
-    }
 
-    public void unload(UUID uuid) {
-        this.firstRoleChange.remove(uuid);
-        this.roles.remove(uuid);
-    }
-
-    public boolean isFirstRoleChange(UUID uuid) {
-        return this.firstRoleChange.contains(uuid);
+    public void setRole(UUID uuid, Roles role, Consumer<Roles> callback) {
+        storage.setRole(uuid, role).thenAccept(v -> {
+            roles.put(uuid, role);
+            firstRoleChange.remove(uuid);
+            callback.accept(role);
+        });
     }
 
     public Roles getRole(UUID uuid) {
-        return this.roles.get(uuid);
+        Roles r = roles.get(uuid);
+        System.out.println("[ROLE-DEBUG] getRole(" + uuid + ") -> " + r);
+        return r;
+    }
+
+    public boolean isFirstRoleChange(UUID uuid) {
+        return firstRoleChange.contains(uuid);
+    }
+
+    public void unload(UUID uuid) {
+        firstRoleChange.remove(uuid);
+        roles.remove(uuid);
     }
 
     public Set<UUID> getPlayersWithRole(Roles role) {
-        final Set<UUID> uuids = new HashSet<>();
-        for (Entry<UUID, Roles> entry : this.roles.entrySet()) {
-            if (entry.getValue() == role) {
-                uuids.add(entry.getKey());
-            }
-        }
-        return uuids;
-    }
-
-    private CompletableFuture<Void> updateRole(UUID uuid, Roles role) {
-        return CompletableFuture.runAsync(() -> this.storage.setRole(uuid, role));
+        Set<UUID> result = new HashSet<>();
+        roles.forEach((uuid, r) -> {
+            if (r == role) result.add(uuid);
+        });
+        return result;
     }
 }
